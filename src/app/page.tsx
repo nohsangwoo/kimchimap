@@ -47,9 +47,15 @@ Object.entries(additionalRegionsWithPlaceholder).forEach(([region, sellers]) => 
 export default function Home() {
 
   const [selectedSellerId, setSelectedSellerId] = useState<string | null>(null);
-  const { theme } = useTheme();
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  console.log("theme in main", theme)
+  // 컴포넌트가 마운트된 후에만 테마 상태를 사용
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  console.log("theme in main", resolvedTheme);
 
   // 선택된 판매자 정보 찾기
   const getSelectedSeller = (): Seller | null => {
@@ -67,38 +73,49 @@ export default function Home() {
   
   // 테마에 따른 스타일 적용
   const mainStyle = {
-    backgroundColor: theme === 'dark' ? '#1a202c' : '#fcfcfd',
-    color: theme === 'dark' ? '#f7fafc' : '#1a202c',
+    backgroundColor: resolvedTheme === 'dark' ? '#1a202c' : '#fcfcfd',
+    color: resolvedTheme === 'dark' ? '#f7fafc' : '#1a202c',
     transition: 'all 0.3s ease'
   };
   
   const headerStyle = {
-    backgroundColor: theme === 'dark' ? '#2d3748' : 'transparent',
-    color: theme === 'dark' ? '#f7fafc' : '#1a202c'
+    backgroundColor: resolvedTheme === 'dark' ? '#2d3748' : 'transparent',
+    color: resolvedTheme === 'dark' ? '#f7fafc' : '#1a202c'
   };
   
   const cardStyle = {
-    backgroundColor: theme === 'dark' ? '#2d3748' : '#ffffff',
-    color: theme === 'dark' ? '#f7fafc' : '#1a202c',
-    boxShadow: theme === 'dark' ? '0 10px 25px -5px rgba(0, 0, 0, 0.5)' : '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
+    backgroundColor: resolvedTheme === 'dark' ? '#2d3748' : '#ffffff',
+    color: resolvedTheme === 'dark' ? '#f7fafc' : '#1a202c',
+    boxShadow: resolvedTheme === 'dark' ? '0 10px 25px -5px rgba(0, 0, 0, 0.5)' : '0 10px 25px -5px rgba(0, 0, 0, 0.1)'
   };
   
   const footerStyle = {
-    backgroundColor: theme === 'dark' ? '#2d3748' : '#ffffff',
-    color: theme === 'dark' ? '#a0aec0' : '#4a5568',
-    borderTopColor: theme === 'dark' ? '#4a5568' : '#e2e8f0'
+    backgroundColor: resolvedTheme === 'dark' ? '#2d3748' : '#ffffff',
+    color: resolvedTheme === 'dark' ? '#a0aec0' : '#4a5568',
+    borderTopColor: resolvedTheme === 'dark' ? '#4a5568' : '#e2e8f0'
   };
+
+  // 서버 사이드 렌더링 시 기본 UI를 보여줌
+  if (!mounted) {
+    return (
+      <main className="min-h-screen transition-colors duration-300 border">
+        <div className="flex items-center justify-center h-screen">
+          <div className="animate-pulse">로딩 중...</div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className={`min-h-screen transition-colors duration-300 border`} style={mainStyle}>
       {/* 헤더 섹션 */}
       <header className="pt-8 pb-12 md:pt-12 md:pb-16 px-4 md:px-8" style={headerStyle}>
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-4xl md:text-6xl font-heading font-bold mb-3 tracking-tight" style={{ color: theme === 'dark' ? '#ffffff' : '#1a202c' }}>
+          <h1 className="text-4xl md:text-6xl font-heading font-bold mb-3 tracking-tight" style={{ color: resolvedTheme === 'dark' ? '#ffffff' : '#1a202c' }}>
             <span className="text-kimchi">대한민국 김치 </span>
             <span>지도</span>
           </h1>
-          <p className="text-lg md:text-xl max-w-3xl mx-auto font-light" style={{ color: theme === 'dark' ? '#e2e8f0' : '#4a5568' }}>
+          <p className="text-lg md:text-xl max-w-3xl mx-auto font-light" style={{ color: resolvedTheme === 'dark' ? '#e2e8f0' : '#4a5568' }}>
             지역별 특색있는 김치 생산자를 만나보세요. 전국 각지의 전통과 맛을 담은 김치를 소개합니다.
           </p>
 
@@ -113,7 +130,7 @@ export default function Home() {
       {!selectedSeller && (
         <div className="max-w-7xl mx-auto px-4 mb-10">
           <div className="rounded-xl shadow-trendy p-6 text-center" style={cardStyle}>
-            <p style={{ color: theme === 'dark' ? '#e2e8f0' : '#4a5568' }}>
+            <p style={{ color: resolvedTheme === 'dark' ? '#e2e8f0' : '#4a5568' }}>
               <span className="font-medium">지도에서 지역을 선택</span>하시면 해당 지역의 김치 생산자 정보를 확인하실 수 있습니다.
             </p>
           </div>
