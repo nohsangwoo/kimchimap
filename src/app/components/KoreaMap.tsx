@@ -82,101 +82,126 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 w-full">
-      <div className="w-full lg:w-3/4 h-[600px] bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 transition-colors duration-300">
-        <ComposableMap
-          projection="geoMercator"
-          projectionConfig={{
-            scale: 5500,
-            center: [128, 36] // 한국 중심점 좌표 조정
-          }}
-          className="w-full h-full"
-        >
-          <ZoomableGroup zoom={1}>
-            <Geographies geography={geoUrl}>
-              {({ geographies }: { geographies: GeoData[] }) =>
-                geographies.map(geo => {
-                  const regionName = geo.properties.name;
-                  const isHovered = hoveredRegion === regionName;
-                  const isSelected = selectedRegion === regionName;
+      <div className="w-full lg:w-3/4 h-[600px] rounded-lg relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-900 z-0"></div>
+        <div className="relative z-10 w-full h-full">
+          <ComposableMap
+            projection="geoMercator"
+            projectionConfig={{
+              scale: 5500,
+              center: [128, 36] // 한국 중심점 좌표 조정
+            }}
+            className="w-full h-full"
+          >
+            <ZoomableGroup zoom={1}>
+              <Geographies geography={geoUrl}>
+                {({ geographies }: { geographies: GeoData[] }) =>
+                  geographies.map(geo => {
+                    const regionName = geo.properties.name;
+                    const isHovered = hoveredRegion === regionName;
+                    const isSelected = selectedRegion === regionName;
 
-                  // 선택된 색상(다크모드/라이트모드 대응)
-                  const colorSet = regionColors[regionName] || { light: "#DDD", dark: "#555" };
-                  const fillColor = isDarkMode ? colorSet.dark : colorSet.light;
-                  
-                  return (
-                    <Geography
-                      key={geo.rsmKey}
-                      geography={geo}
-                      fill={fillColor}
-                      stroke={isDarkMode ? "#333" : "#FFF"}
-                      strokeWidth={isSelected ? 2 : 0.5}
-                      style={{
-                        default: {
-                          fill: fillColor,
-                          outline: "none",
-                          stroke: isSelected ? (isDarkMode ? "#FFF" : "#333") : (isDarkMode ? "#333" : "#FFF"),
-                          strokeWidth: isSelected ? 2 : 0.5
-                        },
-                        hover: {
-                          fill: isDarkMode 
-                            ? `${colorSet.dark}BB` // 다크모드일 때 hover 색상
-                            : `${colorSet.light}CC`, // 라이트모드일 때 hover 색상
-                          outline: "none",
-                          cursor: "pointer"
-                        },
-                        pressed: {
-                          fill: isDarkMode ? "#777" : "#AAA",
-                          outline: "none"
-                        }
-                      }}
-                      onMouseEnter={() => {
-                        setHoveredRegion(regionName);
-                      }}
-                      onMouseLeave={() => {
-                        setHoveredRegion(null);
-                      }}
-                      onClick={() => {
-                        handleRegionClick(regionName);
-                      }}
-                    />
-                  );
-                })
-              }
-            </Geographies>
-          </ZoomableGroup>
-        </ComposableMap>
+                    // 선택된 색상(다크모드/라이트모드 대응)
+                    const colorSet = regionColors[regionName] || { light: "#DDD", dark: "#555" };
+                    const fillColor = isDarkMode ? colorSet.dark : colorSet.light;
+                    
+                    return (
+                      <Geography
+                        key={geo.rsmKey}
+                        geography={geo}
+                        fill={fillColor}
+                        stroke={isDarkMode ? "#333" : "#FFF"}
+                        strokeWidth={isSelected ? 2 : 0.5}
+                        style={{
+                          default: {
+                            fill: fillColor,
+                            outline: "none",
+                            stroke: isSelected ? (isDarkMode ? "#FFF" : "#333") : (isDarkMode ? "#333" : "#FFF"),
+                            strokeWidth: isSelected ? 2 : 0.5,
+                            filter: isSelected ? "drop-shadow(0 0 2px rgba(0,0,0,0.3))" : "none"
+                          },
+                          hover: {
+                            fill: isDarkMode 
+                              ? `${colorSet.dark}BB` // 다크모드일 때 hover 색상
+                              : `${colorSet.light}CC`, // 라이트모드일 때 hover 색상
+                            outline: "none",
+                            cursor: "pointer",
+                            filter: "drop-shadow(0 0 3px rgba(0,0,0,0.2))"
+                          },
+                          pressed: {
+                            fill: isDarkMode ? "#777" : "#AAA",
+                            outline: "none"
+                          }
+                        }}
+                        onMouseEnter={() => {
+                          setHoveredRegion(regionName);
+                        }}
+                        onMouseLeave={() => {
+                          setHoveredRegion(null);
+                        }}
+                        onClick={() => {
+                          handleRegionClick(regionName);
+                        }}
+                      />
+                    );
+                  })
+                }
+              </Geographies>
+            </ZoomableGroup>
+          </ComposableMap>
+        </div>
+
+        {/* 지도 설명 오버레이 */}
+        <div className="absolute bottom-4 left-4 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-trendy text-sm text-gray-600 dark:text-gray-300 max-w-sm opacity-80 hover:opacity-100 transition-opacity">
+          <p className="font-medium">지역별 김치 생산자 맵</p>
+          <p className="text-xs">지역을 클릭하여 해당 지역의 김치 생산자를 확인하세요</p>
+        </div>
       </div>
 
       <div className="w-full lg:w-1/4 h-[600px] relative">
         <div 
-          className={`absolute inset-0 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-y-auto transition-all duration-300 transform
+          className={`absolute inset-0 p-5 bg-white dark:bg-gray-800 rounded-xl shadow-trendy overflow-y-auto transition-all duration-300 transform
             ${isListVisible && selectedRegion ? 'translate-y-0 opacity-100 animate-slide-in' : 'translate-y-8 opacity-0'}
             ${!selectedRegion ? 'pointer-events-none' : 'pointer-events-auto'}
           `}
         >
           {displayRegion ? (
             <>
-              <h2 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">{displayRegion} 김치 생산자</h2>
+              <h2 className="text-xl font-heading font-bold mb-4 text-gray-900 dark:text-white border-b pb-2 border-gray-100 dark:border-gray-700">
+                {displayRegion} <span className="text-kimchi">김치 생산자</span>
+              </h2>
               {sellers[displayRegion] && sellers[displayRegion].length > 0 ? (
                 <ul className="space-y-3">
                   {sellers[displayRegion].map((seller) => (
                     <li 
-                      key={seller.id}
+                      key={`${displayRegion}-${seller.id}`}
                       onClick={() => onSellerClick(seller.id)}
-                      className="p-3 border border-gray-200 dark:border-gray-700 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-all"
+                      className="p-4 border border-gray-100 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-all hover:shadow-sm"
                     >
-                      <h3 className="font-medium text-gray-900 dark:text-white">{seller.name}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300">{seller.location}</p>
-                      <p className="text-sm text-gray-700 dark:text-gray-200">대표 상품: {seller.product}</p>
+                      <h3 className="font-medium text-gray-900 dark:text-white mb-1">{seller.name}</h3>
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">{seller.location}</p>
+                      <p className="text-sm text-gray-700 dark:text-gray-200">
+                        <span className="inline-block px-2 py-1 bg-kimchi-light dark:bg-gray-700 text-kimchi dark:text-gray-300 text-xs rounded-full font-medium">
+                          {seller.product}
+                        </span>
+                      </p>
                     </li>
                   ))}
                 </ul>
               ) : (
-                <p className="text-gray-500 dark:text-gray-400">해당 지역에 등록된 생산자가 없습니다.</p>
+                <div className="flex flex-col items-center justify-center h-64 text-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-gray-400 dark:text-gray-500 mb-2">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
+                  </svg>
+                  <p className="text-gray-500 dark:text-gray-400">해당 지역에 등록된 생산자가 없습니다.</p>
+                </div>
               )}
             </>
           ) : (
-            <div className="flex items-center justify-center h-full">
+            <div className="flex flex-col items-center justify-center h-full text-center">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10 text-gray-300 dark:text-gray-600 mb-3">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z" />
+              </svg>
               <p className="text-gray-500 dark:text-gray-400">지도에서 지역을 선택하세요</p>
             </div>
           )}

@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
+/* 눈누 사이트에서 제공하는 Pretendard 폰트 (현대적이고 가독성 좋은 무료 한글 폰트) */
+
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 248, 250, 252;
-  --background-end-rgb: 241, 245, 249;
+  --foreground-rgb: 51, 51, 51;
+  --background-start-rgb: 252, 252, 253;
+  --background-end-rgb: 248, 249, 250;
 }
 
 .dark {
@@ -20,6 +22,7 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb));
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
 }
 
 @layer utilities {
@@ -29,6 +32,15 @@ body {
   
   .animate-fade-in {
     animation: fadeIn 0.5s ease-out;
+  }
+  
+  .font-heading {
+    font-family: 'Pretendard', sans-serif;
+    font-weight: 700;
+  }
+  
+  .scroll-smooth {
+    scroll-behavior: smooth;
   }
 }
 
@@ -82,4 +94,26 @@ body {
 
 .dark ::-webkit-scrollbar-thumb:hover {
   background-color: rgba(75, 85, 99, 0.7);
+}
+
+/* 김치 테마 색상 커스텀 클래스 */
+.text-kimchi {
+  color: #E03131;
+}
+
+.bg-kimchi-light {
+  background-color: #FFF5F5;
+}
+
+.border-kimchi {
+  border-color: #FFA8A8;
+}
+
+/* 트렌디한 그림자 효과 */
+.shadow-trendy {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.04), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+}
+
+.dark .shadow-trendy {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
 }

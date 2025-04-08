@@ -15,6 +15,98 @@ interface Seller {
   images: string[];
 }
 
+// 추가 지역 데이터 (타입 오류 수정)
+const additionalRegions: Record<string, Seller[]> = {
+  "대구광역시": [
+    {
+      id: "daegu-1",
+      name: "대구 전통 김치",
+      location: "대구시 중구",
+      product: "찹쌀포기김치, 동치미",
+      description: "100년 전통의 대구식 김치를 만듭니다. 찹쌀을 이용한 특별한 양념으로 감칠맛을 살린 김치가 특징입니다.",
+      contactInfo: "053-421-5678 / daegu-kimchi@example.com",
+      images: [
+        "https://images.unsplash.com/photo-1583187552101-e5f7082e62c4?q=80&w=1974&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1583187553384-2516b6ef9e1c?q=80&w=1974&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1583187627942-9b533a3576ef?q=80&w=1974&auto=format&fit=crop"
+      ]
+    },
+    {
+      id: "daegu-2",
+      name: "약령시장 김치",
+      location: "대구시 남구",
+      product: "약재김치, 인삼김치",
+      description: "대구 약령시장에서 영감을 받은 약재를 활용한 건강 김치를 생산합니다. 면역력 증진에 도움을 주는 특별 레시피.",
+      contactInfo: "053-567-8901 / yangnyeong-kimchi@example.com",
+      images: [
+        "https://images.unsplash.com/photo-1583187554852-3039db82fe5e?q=80&w=1974&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1626197031507-c17099753214?q=80&w=2074&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1578160112054-954a67602b88?q=80&w=1974&auto=format&fit=crop"
+      ]
+    }
+  ],
+  "광주광역시": [
+    {
+      id: "gwangju-1",
+      name: "광주 김치 명인",
+      location: "광주시 북구",
+      product: "백김치, 열무김치",
+      description: "전라도 전통 김치의 맛을 이어가는 김치 명인의 비법으로 만든 김치입니다. 깊은 맛과 풍미가 특징입니다.",
+      contactInfo: "062-345-6789 / gwangju-master@example.com",
+      images: [
+        "https://images.unsplash.com/photo-1583187554845-af6ee24f1ef8?q=80&w=1974&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1580651546971-dec959f6e8ee?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1583187544352-6c7818e948d2?q=80&w=1974&auto=format&fit=crop"
+      ]
+    }
+  ],
+  "제주특별자치도": [
+    {
+      id: "jeju-1",
+      name: "제주 해풍 김치",
+      location: "제주시 애월읍",
+      product: "갈치속김치, 해산물김치",
+      description: "제주 바닷바람을 맞고 자란 채소와 신선한 해산물을 활용한 김치입니다. 제주만의 특별한 풍미가 담겨있습니다.",
+      contactInfo: "064-789-0123 / jeju-seafood@example.com",
+      images: [
+        "https://images.unsplash.com/photo-1583187554850-6d1b13ec1408?q=80&w=1974&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1583187553080-5bba890cd788?q=80&w=1974&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1583187554707-06c865526fe8?q=80&w=1974&auto=format&fit=crop"
+      ]
+    }
+  ],
+  "전라북도": [
+    {
+      id: "jeonbuk-1",
+      name: "전주 비빔김치",
+      location: "전라북도 전주시",
+      product: "비빔김치, 돌산갓김치",
+      description: "전주 비빔밥의 고장에서 만든 특별한 비빔김치입니다. 여러 가지 채소와 양념을 절묘하게 조합한 풍미가 일품입니다.",
+      contactInfo: "063-234-5678 / jeonju-kimchi@example.com",
+      images: [
+        "https://images.unsplash.com/photo-1583187553588-85d8c16ae612?q=80&w=1974&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1583187552722-321c94bb421c?q=80&w=1974&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1583187608815-f70a8870943a?q=80&w=1974&auto=format&fit=crop"
+      ]
+    }
+  ],
+  "경상북도": [
+    {
+      id: "gyeongbuk-1",
+      name: "안동 종가 김치",
+      location: "경상북도 안동시",
+      product: "안동식 배추김치, 무말랭이김치",
+      description: "경북 안동의 종가에서 대대로 내려오는 전통 레시피로 만든 김치입니다. 깔끔하고 담백한 맛이 특징입니다.",
+      contactInfo: "054-678-9012 / andong-kimchi@example.com",
+      images: [
+        "https://images.unsplash.com/photo-1583187553349-adfa67dac45f?q=80&w=1974&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1583187544354-aee9a4d21fed?q=80&w=1974&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1583188937447-6d1d3c1c300f?q=80&w=1974&auto=format&fit=crop"
+      ]
+    }
+  ]
+};
+
 // 가짜 판매자 데이터
 const mockSellers: Record<string, Seller[]> = {
   "서울특별시": [
@@ -214,7 +306,6 @@ const mockSellers: Record<string, Seller[]> = {
 // 다른 지역 데이터도 추가
 const otherRegions = {
   "부산광역시": [
-    // ... 기존 데이터 ...
     {
       id: "busan-1",
       name: "해운대 어머니 김치",
@@ -243,7 +334,6 @@ const otherRegions = {
     }
   ],
   "전라남도": [
-    // ... 기존 데이터 ...
     {
       id: "jeonnam-1",
       name: "순천 명품 김치",
@@ -259,7 +349,6 @@ const otherRegions = {
     }
   ],
   "강원특별자치도": [
-    // ... 기존 데이터 ...
     {
       id: "gangwon-1",
       name: "강원 산채 김치",
@@ -276,9 +365,20 @@ const otherRegions = {
   ]
 };
 
-// 나머지 지역 데이터를 추가합니다
-Object.keys(otherRegions).forEach(region => {
-  mockSellers[region] = otherRegions[region];
+// 모든 데이터를 mockSellers에 통합 (타입 안전하게)
+Object.entries(otherRegions).forEach(([region, sellers]) => {
+  if (!mockSellers[region]) {
+    mockSellers[region] = [];
+  }
+  mockSellers[region] = [...mockSellers[region], ...sellers];
+});
+
+// 추가 지역 데이터 병합
+Object.entries(additionalRegions).forEach(([region, sellers]) => {
+  if (!mockSellers[region]) {
+    mockSellers[region] = [];
+  }
+  mockSellers[region] = [...mockSellers[region], ...sellers];
 });
 
 export default function Home() {
@@ -326,45 +426,74 @@ export default function Home() {
   const selectedSeller = getSelectedSeller();
   
   return (
-    <main className="min-h-screen p-4 md:p-8 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      <header className="max-w-7xl mx-auto mb-8 flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl md:text-4xl font-bold mb-2 text-gray-900 dark:text-white">김치 지도</h1>
-          <p className="text-gray-600 dark:text-gray-300">지역별 김치 생산자와 판매자를 찾아보세요</p>
+    <main className="min-h-screen bg-gradient-to-b from-[#fcfcfd] to-[#f8f9fa] dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
+      {/* 헤더 섹션 */}
+      <header className="pt-8 pb-12 md:pt-12 md:pb-16 px-4 md:px-8">
+        <div className="max-w-7xl mx-auto text-center">
+          <h1 className="text-4xl md:text-6xl font-heading font-bold mb-3 text-gray-900 dark:text-white tracking-tight">
+            <span className="text-kimchi">대한민국 김치 </span>
+            <span>지도</span>
+          </h1>
+          <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto font-light">
+            지역별 특색있는 김치 생산자를 만나보세요. 전국 각지의 전통과 맛을 담은 김치를 소개합니다.
+          </p>
+          
+          {/* 다크모드 토글 버튼 */}
+          <button 
+            onClick={toggleDarkMode}
+            className="mt-6 p-3 rounded-full bg-white dark:bg-gray-700 shadow-trendy text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors"
+            aria-label="다크 모드 토글"
+          >
+            {isDarkMode ? (
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+              </svg>
+            )}
+          </button>
         </div>
-        
-        <button 
-          onClick={toggleDarkMode}
-          className="p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-          aria-label="다크 모드 토글"
-        >
-          {isDarkMode ? (
-            // 해 아이콘 (라이트 모드로 전환)
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 3v2.25m6.364.386-1.591 1.591M21 12h-2.25m-.386 6.364-1.591-1.591M12 18.75V21m-4.773-4.227-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0Z" />
-            </svg>
-          ) : (
-            // 달 아이콘 (다크 모드로 전환)
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
-            </svg>
-          )}
-        </button>
       </header>
       
-      <div className="max-w-7xl mx-auto">
+      {/* 소개 문구 */}
+      {!selectedSeller && (
+        <div className="max-w-7xl mx-auto px-4 mb-10">
+          <div className="bg-white dark:bg-gray-800 rounded-xl shadow-trendy p-6 text-center">
+            <p className="text-gray-700 dark:text-gray-200">
+              <span className="font-medium">지도에서 지역을 선택</span>하시면 해당 지역의 김치 생산자 정보를 확인하실 수 있습니다.
+            </p>
+          </div>
+        </div>
+      )}
+      
+      {/* 메인 컨텐츠 */}
+      <div className="max-w-7xl mx-auto px-4 md:px-8 pb-16">
         {selectedSeller ? (
-          <SellerProfile 
-            seller={selectedSeller}
-            onBack={() => setSelectedSellerId(null)}
-          />
+          <div className="animate-fade-in">
+            <SellerProfile 
+              seller={selectedSeller}
+              onBack={() => setSelectedSellerId(null)}
+            />
+          </div>
         ) : (
-          <KoreaMap 
-            sellers={mockSellers}
-            onSellerClick={(sellerId) => setSelectedSellerId(sellerId)}
-          />
+          <div className="shadow-trendy rounded-xl overflow-hidden bg-white dark:bg-gray-800">
+            <KoreaMap 
+              sellers={mockSellers}
+              onSellerClick={(sellerId) => setSelectedSellerId(sellerId)}
+            />
+          </div>
         )}
       </div>
+      
+      {/* 푸터 */}
+      <footer className="bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 py-8 mt-auto">
+        <div className="max-w-7xl mx-auto px-4 md:px-8 text-center text-gray-600 dark:text-gray-400">
+          <p className="mb-2">© 2023 김치 지도. 모든 권리 보유.</p>
+          <p className="text-sm">한국 전통 김치의 아름다움과 맛을 전 세계에 알립니다.</p>
+        </div>
+      </footer>
     </main>
   );
 }
