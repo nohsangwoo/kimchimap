@@ -59,7 +59,11 @@ interface GeoData {
 }
 
 const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
+  const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+
+  // 현재 표시할 지역 (호버 상태가 우선, 없으면 선택된 지역)
+  const displayRegion = hoveredRegion || selectedRegion;
 
   return (
     <div className="flex flex-col md:flex-row gap-6 w-full">
@@ -76,6 +80,7 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
               {({ geographies }: { geographies: GeoData[] }) =>
                 geographies.map(geo => {
                   const regionName = geo.properties.name;
+                  const isHovered = hoveredRegion === regionName;
                   const isSelected = selectedRegion === regionName;
                   
                   return (
@@ -84,11 +89,13 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
                       geography={geo}
                       fill={regionColors[regionName] || "#DDD"}
                       stroke="#FFF"
-                      strokeWidth={0.5}
+                      strokeWidth={isSelected ? 1.5 : 0.5}
                       style={{
                         default: {
                           fill: regionColors[regionName] || "#DDD",
-                          outline: "none"
+                          outline: "none",
+                          stroke: isSelected ? "#333" : "#FFF",
+                          strokeWidth: isSelected ? 1.5 : 0.5
                         },
                         hover: {
                           fill: regionColors[regionName] 
@@ -103,10 +110,13 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
                         }
                       }}
                       onMouseEnter={() => {
-                        setSelectedRegion(regionName);
+                        setHoveredRegion(regionName);
                       }}
                       onMouseLeave={() => {
-                        setSelectedRegion(null);
+                        setHoveredRegion(null);
+                      }}
+                      onClick={() => {
+                        setSelectedRegion(regionName);
                       }}
                     />
                   );
@@ -118,12 +128,12 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
       </div>
 
       <div className="w-full md:w-1/2 p-4 bg-white rounded-lg shadow-sm overflow-y-auto h-[500px]">
-        {selectedRegion ? (
+        {displayRegion ? (
           <>
-            <h2 className="text-xl font-medium mb-4">{selectedRegion} 김치 생산자</h2>
-            {sellers[selectedRegion] && sellers[selectedRegion].length > 0 ? (
+            <h2 className="text-xl font-medium mb-4">{displayRegion} 김치 생산자</h2>
+            {sellers[displayRegion] && sellers[displayRegion].length > 0 ? (
               <ul className="space-y-3">
-                {sellers[selectedRegion].map((seller) => (
+                {sellers[displayRegion].map((seller) => (
                   <li 
                     key={seller.id}
                     onClick={() => onSellerClick(seller.id)}
