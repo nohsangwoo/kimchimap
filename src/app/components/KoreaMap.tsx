@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ComposableMap, 
   Geographies, 
@@ -7,6 +7,7 @@ import {
   GeographyProps
 } from 'react-simple-maps';
 import { geoCentroid } from 'd3-geo';
+import { useTheme } from 'next-themes';
 
 // 한국 지도 데이터
 const geoUrl = 'https://raw.githubusercontent.com/southkorea/southkorea-maps/master/kostat/2018/json/skorea-provinces-2018-topo-simple.json';
@@ -59,9 +60,16 @@ interface GeoData {
 }
 
 const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
+  const { theme, resolvedTheme } = useTheme();
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [isListVisible, setIsListVisible] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // 컴포넌트가 마운트된 후에만 테마 상태를 사용
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // 현재 표시할 지역 (호버 상태가 우선, 없으면 선택된 지역)
   const displayRegion = hoveredRegion || selectedRegion;
@@ -77,10 +85,76 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
     }, 50);
   };
 
+  // 테마에 따른 스타일 정의
+  const mapBgStyle = {
+    backgroundColor: resolvedTheme === 'dark' ? '#1a202c' : '#ffffff',
+    backgroundImage: resolvedTheme === 'dark' 
+      ? 'linear-gradient(to bottom right, #1a202c, #2d3748)' 
+      : 'linear-gradient(to bottom right, #ffffff, #f7fafc)',
+  };
+
+  const mapOverlayStyle = {
+    backgroundColor: resolvedTheme === 'dark' ? 'rgba(45, 55, 72, 0.9)' : 'rgba(255, 255, 255, 0.8)',
+    color: resolvedTheme === 'dark' ? '#e2e8f0' : '#4a5568',
+    boxShadow: resolvedTheme === 'dark' 
+      ? '0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.36)' 
+      : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+  };
+
+  const sidebarStyle = {
+    backgroundColor: resolvedTheme === 'dark' ? '#2d3748' : '#ffffff',
+    boxShadow: resolvedTheme === 'dark' 
+      ? '0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3)' 
+      : '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+    borderColor: resolvedTheme === 'dark' ? '#4a5568' : '#e2e8f0'
+  };
+
+  const titleStyle = {
+    color: resolvedTheme === 'dark' ? '#f7fafc' : '#1a202c',
+    borderColor: resolvedTheme === 'dark' ? '#4a5568' : '#edf2f7'
+  };
+
+  const sellerItemStyle = {
+    borderColor: resolvedTheme === 'dark' ? '#4a5568' : '#edf2f7',
+    backgroundColor: resolvedTheme === 'dark' ? '#2d3748' : '#ffffff',
+    transition: 'all 0.2s ease'
+  };
+
+  const sellerItemHoverStyle = {
+    backgroundColor: resolvedTheme === 'dark' ? '#3a4559' : '#f7fafc',
+  };
+
+  const [hoverStates, setHoverStates] = useState<Record<string, boolean>>({});
+
+  const handleSellerMouseEnter = (sellerId: string) => {
+    setHoverStates(prev => ({ ...prev, [sellerId]: true }));
+  };
+
+  const handleSellerMouseLeave = (sellerId: string) => {
+    setHoverStates(prev => ({ ...prev, [sellerId]: false }));
+  };
+
+  const getSellerItemStyle = (sellerId: string) => {
+    return {
+      ...sellerItemStyle,
+      ...(hoverStates[sellerId] ? sellerItemHoverStyle : {})
+    };
+  };
+
+  if (!mounted) {
+    // 렌더링 시 깜빡임 방지를 위한 빈 레이아웃
+    return (
+      <div className="flex flex-col lg:flex-row gap-6 w-full">
+        <div className="w-full lg:w-3/4 h-[600px] rounded-lg relative overflow-hidden"></div>
+        <div className="w-full lg:w-1/4 h-[600px] relative"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col lg:flex-row gap-6 w-full">
       <div className="w-full lg:w-3/4 h-[600px] rounded-lg relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-white to-gray-50 z-0"></div>
+        <div className="absolute inset-0 z-0" style={mapBgStyle}></div>
         <div className="relative z-10 w-full h-full">
           <ComposableMap
             projection="geoMercator"
@@ -106,13 +180,13 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
                         key={geo.rsmKey}
                         geography={geo}
                         fill={fillColor}
-                        stroke={"#FFF"}
+                        stroke={resolvedTheme === 'dark' ? "#4a5568" : "#FFF"}
                         strokeWidth={isSelected ? 2 : 0.5}
                         style={{
                           default: {
                             fill: fillColor,
                             outline: "none",
-                            stroke: isSelected ? "#333" : "#FFF",
+                            stroke: isSelected ? (resolvedTheme === 'dark' ? "#f7fafc" : "#333") : (resolvedTheme === 'dark' ? "#4a5568" : "#FFF"),
                             strokeWidth: isSelected ? 2 : 0.5,
                             filter: isSelected ? "drop-shadow(0 0 2px rgba(0,0,0,0.3))" : "none"
                           },
@@ -123,7 +197,7 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
                             filter: "drop-shadow(0 0 3px rgba(0,0,0,0.2))"
                           },
                           pressed: {
-                            fill: "#AAA",
+                            fill: resolvedTheme === 'dark' ? "#3a4559" : "#AAA",
                             outline: "none"
                           }
                         }}
@@ -146,7 +220,7 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
         </div>
 
         {/* 지도 설명 오버레이 */}
-        <div className="absolute bottom-4 left-4 bg-white p-3 rounded-lg shadow-trendy text-sm text-gray-600 max-w-sm opacity-80 hover:opacity-100 transition-opacity">
+        <div className="absolute bottom-4 left-4 p-3 rounded-lg text-sm max-w-sm opacity-80 hover:opacity-100 transition-opacity" style={mapOverlayStyle}>
           <p className="font-medium">지역별 김치 생산자 맵</p>
           <p className="text-xs">지역을 클릭하여 해당 지역의 김치 생산자를 확인하세요</p>
         </div>
@@ -154,14 +228,18 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
 
       <div className="w-full lg:w-1/4 h-[600px] relative">
         <div 
-          className={`absolute inset-0 p-5 bg-white dark:bg-gray-800 rounded-xl shadow-trendy overflow-y-auto transition-all duration-300 transform
-            ${isListVisible && selectedRegion ? 'translate-y-0 opacity-100 animate-slide-in' : 'translate-y-8 opacity-0'}
-            ${!selectedRegion ? 'pointer-events-none' : 'pointer-events-auto'}
-          `}
+          style={{
+            ...sidebarStyle,
+            transform: isListVisible && selectedRegion ? 'translateY(0)' : 'translateY(8px)',
+            opacity: isListVisible && selectedRegion ? 1 : 0,
+            pointerEvents: selectedRegion ? 'auto' : 'none',
+            transition: 'all 0.3s ease'
+          }}
+          className="absolute inset-0 p-5 rounded-xl overflow-y-auto"
         >
           {displayRegion ? (
             <>
-              <h2 className="text-xl font-heading font-bold mb-4 text-gray-900 dark:text-white border-b pb-2 border-gray-100 dark:border-gray-700">
+              <h2 className="text-xl font-heading font-bold mb-4 border-b pb-2" style={titleStyle}>
                 {displayRegion} <span className="text-kimchi">김치 생산자</span>
               </h2>
               {sellers[displayRegion] && sellers[displayRegion].length > 0 ? (
@@ -170,12 +248,18 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
                     <li 
                       key={`${displayRegion}-${seller.id}`}
                       onClick={() => onSellerClick(seller.id)}
-                      className="p-4 border border-gray-100 dark:border-gray-700 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer transition-all hover:shadow-sm"
+                      onMouseEnter={() => handleSellerMouseEnter(seller.id)}
+                      onMouseLeave={() => handleSellerMouseLeave(seller.id)}
+                      className="p-4 rounded-lg cursor-pointer transition-all"
+                      style={getSellerItemStyle(seller.id)}
                     >
-                      <h3 className="font-medium text-gray-900 dark:text-white mb-1">{seller.name}</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">{seller.location}</p>
-                      <p className="text-sm text-gray-700 dark:text-gray-200">
-                        <span className="inline-block px-2 py-1 bg-kimchi-light dark:bg-gray-700 text-kimchi dark:text-gray-300 text-xs rounded-full font-medium">
+                      <h3 style={{ color: resolvedTheme === 'dark' ? '#f7fafc' : '#1a202c' }} className="font-medium mb-1">{seller.name}</h3>
+                      <p style={{ color: resolvedTheme === 'dark' ? '#a0aec0' : '#4a5568' }} className="text-sm mb-1">{seller.location}</p>
+                      <p className="text-sm">
+                        <span style={{ 
+                          backgroundColor: resolvedTheme === 'dark' ? '#4a5568' : '#FEF3F2',
+                          color: resolvedTheme === 'dark' ? '#e2e8f0' : '#E53E3E'
+                        }} className="inline-block px-2 py-1 text-xs rounded-full font-medium">
                           {seller.product}
                         </span>
                       </p>
@@ -184,19 +268,19 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
                 </ul>
               ) : (
                 <div className="flex flex-col items-center justify-center h-64 text-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-8 h-8 text-gray-400 dark:text-gray-500 mb-2">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke={resolvedTheme === 'dark' ? '#a0aec0' : '#718096'} className="w-8 h-8 mb-2">
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z" />
                   </svg>
-                  <p className="text-gray-500 dark:text-gray-400">해당 지역에 등록된 생산자가 없습니다.</p>
+                  <p style={{ color: resolvedTheme === 'dark' ? '#a0aec0' : '#718096' }}>해당 지역에 등록된 생산자가 없습니다.</p>
                 </div>
               )}
             </>
           ) : (
             <div className="flex flex-col items-center justify-center h-full text-center">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-10 h-10 text-gray-300 dark:text-gray-600 mb-3">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke={resolvedTheme === 'dark' ? '#4a5568' : '#cbd5e0'} className="w-10 h-10 mb-3">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 6.75V15m6-6v8.25m.503 3.498 4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 0 0-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0Z" />
               </svg>
-              <p className="text-gray-500 dark:text-gray-400">지도에서 지역을 선택하세요</p>
+              <p style={{ color: resolvedTheme === 'dark' ? '#a0aec0' : '#718096' }}>지도에서 지역을 선택하세요</p>
             </div>
           )}
         </div>
