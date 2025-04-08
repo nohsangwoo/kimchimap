@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   ComposableMap, 
   Geographies, 
@@ -65,6 +65,11 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [isListVisible, setIsListVisible] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [hoverPosition, setHoverPosition] = useState({ x: 0, y: 0 });
+  const [fixedPosition, setFixedPosition] = useState({ x: 0, y: 0 });
+  const [showPopup, setShowPopup] = useState(false);
+  const [isPopupFixed, setIsPopupFixed] = useState(false);
+  const mapRef = useRef<HTMLDivElement>(null);
 
   // 컴포넌트가 마운트된 후에만 테마 상태를 사용
   useEffect(() => {
@@ -76,13 +81,38 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
 
   // 선택된 지역이 변경될 때 목록 애니메이션 활성화
   const handleRegionClick = (regionName: string) => {
-    setSelectedRegion(regionName);
-    setIsListVisible(false);
-    
-    // 애니메이션 효과를 위해 약간의 지연 후 목록 표시
-    setTimeout(() => {
-      setIsListVisible(true);
-    }, 50);
+    // 기존 팝업이 고정되어 있고 같은 지역을 클릭한 경우 팝업 고정 해제
+    if (isPopupFixed && selectedRegion === regionName) {
+      setIsPopupFixed(false);
+    } else {
+      // 다른 지역을 클릭한 경우 새 위치에 팝업 고정
+      setSelectedRegion(regionName);
+      setFixedPosition({...hoverPosition});
+      setIsPopupFixed(true);
+      setIsListVisible(false);
+      
+      // 애니메이션 효과를 위해 약간의 지연 후 목록 표시
+      setTimeout(() => {
+        setIsListVisible(true);
+      }, 50);
+    }
+  };
+
+  // 팝업창 닫기 버튼 클릭 핸들러
+  const handleClosePopup = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsPopupFixed(false);
+  };
+
+  // 마우스 위치 추적 핸들러
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (mapRef.current) {
+      const rect = mapRef.current.getBoundingClientRect();
+      setHoverPosition({
+        x: e.clientX - rect.left,
+        y: e.clientY - rect.top
+      });
+    }
   };
 
   // 테마에 따른 스타일 정의
@@ -99,6 +129,15 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
     boxShadow: resolvedTheme === 'dark' 
       ? '0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.36)' 
       : '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)'
+  };
+
+  const popupStyle = {
+    backgroundColor: resolvedTheme === 'dark' ? 'rgba(45, 55, 72, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+    color: resolvedTheme === 'dark' ? '#e2e8f0' : '#4a5568',
+    boxShadow: resolvedTheme === 'dark' 
+      ? '0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.36)' 
+      : '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+    borderColor: resolvedTheme === 'dark' ? '#4a5568' : '#e2e8f0'
   };
 
   const sidebarStyle = {
@@ -153,7 +192,11 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
 
   return (
     <div className="flex flex-col lg:flex-row gap-6 w-full">
-      <div className="w-full lg:w-3/4 h-[600px] rounded-lg relative overflow-hidden">
+      <div 
+        className="w-full lg:w-3/4 h-[600px] rounded-lg relative overflow-hidden"
+        onMouseMove={handleMouseMove}
+        ref={mapRef}
+      >
         <div className="absolute inset-0 z-0" style={mapBgStyle}></div>
         <div className="relative z-10 w-full h-full">
           <ComposableMap
@@ -203,9 +246,15 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
                         }}
                         onMouseEnter={() => {
                           setHoveredRegion(regionName);
+                          if (!isPopupFixed) {
+                            setShowPopup(true);
+                          }
                         }}
                         onMouseLeave={() => {
                           setHoveredRegion(null);
+                          if (!isPopupFixed) {
+                            setShowPopup(false);
+                          }
                         }}
                         onClick={() => {
                           handleRegionClick(regionName);
@@ -218,6 +267,82 @@ const KoreaMap: React.FC<KoreaMapProps> = ({ sellers, onSellerClick }) => {
             </ZoomableGroup>
           </ComposableMap>
         </div>
+
+        {/* 호버 시 나타나는 팝업창 */}
+        {((showPopup && hoveredRegion) || (isPopupFixed && selectedRegion)) && (
+          <div 
+            className="absolute z-30 p-3 rounded-lg shadow-lg border min-w-[200px] max-w-[250px]"
+            style={{
+              ...popupStyle,
+              left: isPopupFixed ? fixedPosition.x + 15 : hoverPosition.x + 15,
+              top: isPopupFixed ? fixedPosition.y + 10 : hoverPosition.y + 10,
+              transform: `translateY(${(isPopupFixed ? fixedPosition.y : hoverPosition.y) > 400 ? '-100%' : '0'})`,
+              transition: isPopupFixed ? 'none' : 'opacity 0.2s ease',
+              maxHeight: '300px',
+              overflow: 'auto'
+            }}
+          >
+            {isPopupFixed && (
+              <button 
+                onClick={handleClosePopup}
+                className="absolute top-1 right-1 w-5 h-5 rounded-full flex items-center justify-center hover:bg-opacity-80 text-xs"
+                style={{
+                  backgroundColor: resolvedTheme === 'dark' ? 'rgba(74, 85, 104, 0.3)' : 'rgba(237, 242, 247, 0.7)'
+                }}
+              >
+                ✕
+              </button>
+            )}
+            <h3 className="text-sm font-bold mb-2 border-b pb-1" style={titleStyle}>
+              {(isPopupFixed ? selectedRegion : hoveredRegion)} <span className="text-kimchi">김치 생산자</span>
+            </h3>
+            <ul className="space-y-2">
+              {sellers[isPopupFixed ? selectedRegion! : hoveredRegion!] && 
+               sellers[isPopupFixed ? selectedRegion! : hoveredRegion!].slice(0, 3).map((seller) => (
+                <li 
+                  key={`popup-${isPopupFixed ? selectedRegion : hoveredRegion}-${seller.id}`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onSellerClick(seller.id);
+                  }}
+                  className="p-2 rounded-md cursor-pointer text-xs hover:bg-opacity-80"
+                  style={{ 
+                    backgroundColor: resolvedTheme === 'dark' ? 'rgba(74, 85, 104, 0.3)' : 'rgba(237, 242, 247, 0.7)'
+                  }}
+                >
+                  <p className="font-medium" style={{ color: resolvedTheme === 'dark' ? '#f7fafc' : '#1a202c' }}>
+                    {seller.name}
+                  </p>
+                  <p style={{ color: resolvedTheme === 'dark' ? '#a0aec0' : '#4a5568' }}>
+                    {seller.location}
+                  </p>
+                  <span style={{ 
+                    backgroundColor: resolvedTheme === 'dark' ? '#4a5568' : '#FEF3F2',
+                    color: resolvedTheme === 'dark' ? '#e2e8f0' : '#E53E3E'
+                  }} className="inline-block px-1.5 py-0.5 text-[10px] rounded-full font-medium mt-1">
+                    {seller.product}
+                  </span>
+                </li>
+              ))}
+              {sellers[isPopupFixed ? selectedRegion! : hoveredRegion!] && 
+               sellers[isPopupFixed ? selectedRegion! : hoveredRegion!].length > 3 && (
+                <li className="text-xs text-center pt-1">
+                  <span style={{ color: resolvedTheme === 'dark' ? '#a0aec0' : '#718096' }}>
+                    외 {sellers[isPopupFixed ? selectedRegion! : hoveredRegion!].length - 3}개 더보기...
+                  </span>
+                </li>
+              )}
+              {(!sellers[isPopupFixed ? selectedRegion! : hoveredRegion!] || 
+                sellers[isPopupFixed ? selectedRegion! : hoveredRegion!].length === 0) && (
+                <li className="text-xs text-center py-2">
+                  <span style={{ color: resolvedTheme === 'dark' ? '#a0aec0' : '#718096' }}>
+                    해당 지역에 등록된 생산자가 없습니다.
+                  </span>
+                </li>
+              )}
+            </ul>
+          </div>
+        )}
 
         {/* 지도 설명 오버레이 */}
         <div className="absolute bottom-4 left-4 p-3 rounded-lg text-sm max-w-sm opacity-80 hover:opacity-100 transition-opacity" style={mapOverlayStyle}>
