@@ -104,6 +104,36 @@ const additionalRegions: Record<string, Seller[]> = {
         "https://images.unsplash.com/photo-1583188937447-6d1d3c1c300f?q=80&w=1974&auto=format&fit=crop"
       ]
     }
+  ],
+  "전라남도": [
+    {
+      id: "jeonnam-3",
+      name: "여수 어가 김치",
+      location: "전라남도 여수시",
+      product: "젓갈김치, 해초김치",
+      description: "여수 바다에서 갓 잡은 해산물로 만드는 풍미 가득한 젓갈김치와, 신선한 해초를 활용한 특색있는 김치입니다.",
+      contactInfo: "061-456-7890 / yeosu-kimchi@example.com",
+      images: [
+        "https://images.unsplash.com/photo-1583187553588-85d8c16ae612?q=80&w=1974&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1583187553080-5bba890cd788?q=80&w=1974&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1590301157622-795d847044c7?q=80&w=2070&auto=format&fit=crop"
+      ]
+    }
+  ],
+  "강원특별자치도": [
+    {
+      id: "gangwon-1",
+      name: "강원 산채 김치",
+      location: "강원도 평창군",
+      product: "고랭지 배추김치, 곤드레나물김치",
+      description: "강원도의 청정 자연에서 자란 산나물과 채소로 만든 특별한 김치입니다. 평창의 맑은 공기와 물로 발효시킵니다.",
+      contactInfo: "033-678-9012 / gangwon-kimchi@example.com",
+      images: [
+        "https://images.unsplash.com/photo-1583187554080-5d31a73d0510?q=80&w=1974&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1576020997414-8ac4f0ea984c?q=80&w=1974&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1590301157890-4810ed352733?q=80&w=2070&auto=format&fit=crop"
+      ]
+    }
   ]
 };
 
@@ -271,21 +301,6 @@ const mockSellers: Record<string, Seller[]> = {
       ]
     }
   ],
-  "전라남도": [
-    {
-      id: "jeonnam-1",
-      name: "순천 명품 김치",
-      location: "전라남도 순천시",
-      product: "갓김치, 무말랭이김치",
-      description: "전라도 특유의 맛깔스러운 양념으로 만든 김치입니다. 순천의 기름진 땅에서 자란 신선한 채소만을 사용합니다.",
-      contactInfo: "061-345-6789 / suncheon-kimchi@example.com",
-      images: [
-        "https://images.unsplash.com/photo-1583669095223-2f7aa4a41449?q=80&w=1974&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1563565375-943015199386?q=80&w=1974&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1599232288126-7dbd2127db14?q=80&w=1973&auto=format&fit=crop"
-      ]
-    }
-  ],
   "강원특별자치도": [
     {
       id: "gangwon-1",
@@ -335,7 +350,7 @@ const otherRegions = {
   ],
   "전라남도": [
     {
-      id: "jeonnam-1",
+      id: "jeonnam-2",
       name: "순천 명품 김치",
       location: "전라남도 순천시",
       product: "갓김치, 무말랭이김치",
