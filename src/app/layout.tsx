@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Script from "next/script";
+import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -24,29 +24,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <head>
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" />
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#fcfcfd] dark:bg-gray-900 text-gray-900 dark:text-white`}
-      >
-        {children}
-        {/* 다크모드 스크립트를 NEXT_BODY_TAGS에 삽입 - 하이드레이션 이후 실행 */}
-        <Script id="dark-mode-script" strategy="afterInteractive">
-          {`
-            (function() {
-              try {
-                var mode = localStorage.getItem('darkMode');
-                if (mode === 'true') {
-                  document.documentElement.classList.add('dark');
-                } else if (mode === 'false') {
-                  document.documentElement.classList.remove('dark');
-                }
-              } catch (e) {}
-            })();
-          `}
-        </Script>
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );
