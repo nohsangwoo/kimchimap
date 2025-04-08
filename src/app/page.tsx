@@ -380,20 +380,39 @@ const otherRegions = {
   ]
 };
 
-// 모든 데이터를 mockSellers에 통합 (타입 안전하게)
-Object.entries(otherRegions).forEach(([region, sellers]) => {
-  if (!mockSellers[region]) {
-    mockSellers[region] = [];
+// 함수를 만들어 모든 판매자의 이미지를 placeholder로 대체
+const replaceWithPlaceholder = (sellerData: Record<string, Seller[]>): Record<string, Seller[]> => {
+  const result: Record<string, Seller[]> = {};
+  
+  for (const [region, sellers] of Object.entries(sellerData)) {
+    result[region] = sellers.map(seller => ({
+      ...seller,
+      images: ['/placeholder.svg', '/placeholder.svg', '/placeholder.svg'] // 모든 이미지를 placeholder로 대체
+    }));
   }
-  mockSellers[region] = [...mockSellers[region], ...sellers];
+  
+  return result;
+};
+
+// 모든 이미지를 placeholder로 대체
+const additionalRegionsWithPlaceholder = replaceWithPlaceholder(additionalRegions);
+const mockSellersWithPlaceholder = replaceWithPlaceholder(mockSellers);
+const otherRegionsWithPlaceholder = replaceWithPlaceholder(otherRegions);
+
+// 데이터 병합 로직 수정
+Object.entries(otherRegionsWithPlaceholder).forEach(([region, sellers]) => {
+  if (!mockSellersWithPlaceholder[region]) {
+    mockSellersWithPlaceholder[region] = [];
+  }
+  mockSellersWithPlaceholder[region] = [...mockSellersWithPlaceholder[region], ...sellers];
 });
 
 // 추가 지역 데이터 병합
-Object.entries(additionalRegions).forEach(([region, sellers]) => {
-  if (!mockSellers[region]) {
-    mockSellers[region] = [];
+Object.entries(additionalRegionsWithPlaceholder).forEach(([region, sellers]) => {
+  if (!mockSellersWithPlaceholder[region]) {
+    mockSellersWithPlaceholder[region] = [];
   }
-  mockSellers[region] = [...mockSellers[region], ...sellers];
+  mockSellersWithPlaceholder[region] = [...mockSellersWithPlaceholder[region], ...sellers];
 });
 
 export default function Home() {
@@ -402,14 +421,13 @@ export default function Home() {
   
   // 다크모드 토글 및 저장
   useEffect(() => {
-    // 로컬 스토리지에서 다크모드 설정 불러오기
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-    setIsDarkMode(savedDarkMode);
-    
-    if (savedDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    // 클라이언트 사이드에서만 실행
+    if (typeof window !== 'undefined') {
+      // 로컬 스토리지에서 다크모드 설정 불러오기
+      const savedDarkMode = localStorage.getItem('darkMode') === 'true';
+      
+      // 상태 업데이트만 하고, DOM 직접 조작은 하지 않음
+      setIsDarkMode(savedDarkMode);
     }
   }, []);
   
@@ -417,12 +435,16 @@ export default function Home() {
   const toggleDarkMode = () => {
     const newMode = !isDarkMode;
     setIsDarkMode(newMode);
-    localStorage.setItem('darkMode', newMode.toString());
     
-    if (newMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('darkMode', newMode.toString());
+      
+      // 직접 DOM 조작
+      if (newMode) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     }
   };
   
@@ -430,8 +452,8 @@ export default function Home() {
   const getSelectedSeller = (): Seller | null => {
     if (!selectedSellerId) return null;
     
-    for (const region in mockSellers) {
-      const seller = mockSellers[region].find(s => s.id === selectedSellerId);
+    for (const region in mockSellersWithPlaceholder) {
+      const seller = mockSellersWithPlaceholder[region].find(s => s.id === selectedSellerId);
       if (seller) return seller;
     }
     
@@ -495,7 +517,7 @@ export default function Home() {
         ) : (
           <div className="shadow-trendy rounded-xl overflow-hidden bg-white dark:bg-gray-800">
             <KoreaMap 
-              sellers={mockSellers}
+              sellers={mockSellersWithPlaceholder}
               onSellerClick={(sellerId) => setSelectedSellerId(sellerId)}
             />
           </div>

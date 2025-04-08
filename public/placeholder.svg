@@ -1,0 +1,12 @@
+<svg width="400" height="300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+  <!-- 배경 -->
+  <rect width="400" height="300" fill="#f0f0f0" />
+  
+  <!-- 이미지 아이콘 -->
+  <rect x="160" y="100" width="80" height="60" rx="5" stroke="#aaa" stroke-width="2" fill="none" />
+  <circle cx="180" cy="120" r="8" fill="#aaa" />
+  <polygon points="160,160 190,130 210,150 240,120 240,160" fill="#aaa" />
+  
+  <!-- 텍스트 -->
+  <text x="200" y="190" font-family="Arial, sans-serif" font-size="14" text-anchor="middle" fill="#888">김치 이미지</text>
+</svg>
